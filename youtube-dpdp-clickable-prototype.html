@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YouTube DPDP Consent Prototype</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #0f0f0f;
+      --muted: #606469;
+      --line: #dadce0;
+      --soft: #f5f6f7;
+      --red: #ff0033;
+      --blue: #1a73e8;
+      --green: #188038;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #e9ecef;
+      color: var(--ink);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .phone {
+      width: min(390px, 100%);
+      min-height: 760px;
+      background: var(--white);
+      border: 1px solid #c9ced6;
+      border-radius: 34px;
+      box-shadow: 0 24px 70px rgba(15, 15, 15, 0.18);
+      overflow: hidden;
+      position: relative;
+    }
+    .topbar {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+    .play {
+      width: 34px;
+      height: 24px;
+      background: var(--red);
+      border-radius: 7px;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      padding-left: 2px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    main { padding: 22px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .eyebrow {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.08;
+      margin: 0 0 14px;
+      letter-spacing: 0;
+    }
+    p {
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 0 0 16px;
+    }
+    .hero {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+    .row:first-child { border-top: 0; }
+    .row strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .row span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.32;
+    }
+    .toggle {
+      flex: 0 0 auto;
+      width: 48px;
+      height: 28px;
+      border-radius: 999px;
+      border: 0;
+      background: #c6cace;
+      padding: 3px;
+      cursor: pointer;
+    }
+    .toggle::after {
+      content: "";
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      transition: transform 160ms ease;
+    }
+    .toggle.on { background: var(--red); }
+    .toggle.on::after { transform: translateX(20px); }
+    .input {
+      width: 100%;
+      border: 1px solid var(--line);
+      padding: 14px;
+      font-size: 15px;
+      margin: 8px 0 16px;
+      border-radius: 0;
+    }
+    .actions {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 22px;
+      display: grid;
+      gap: 10px;
+    }
+    button.primary,
+    button.secondary {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button.primary { background: var(--ink); color: var(--white); }
+    button.secondary { background: var(--soft); color: var(--ink); border: 1px solid var(--line); }
+    .link-button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font-weight: 800;
+      padding: 0;
+      cursor: pointer;
+    }
+    .progress {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin: 4px 22px 0;
+    }
+    .bar {
+      height: 4px;
+      background: var(--line);
+    }
+    .bar.done { background: var(--red); }
+    .check {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      margin: 28px 0 18px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0 6px 8px 0;
+    }
+    .hide-actions .actions { display: none; }
+    @media (max-height: 760px) {
+      body { place-items: start center; }
+      .phone { min-height: 720px; }
+      main { padding-bottom: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" aria-live="polite">
+    <div class="topbar">
+      <div class="brand"><div class="play">▶</div><span>YouTube</span></div>
+      <div class="avatar">A</div>
+    </div>
+    <div class="progress" aria-hidden="true">
+      <div class="bar done"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <main>
+      <section class="screen active" id="s1">
+        <div class="eyebrow">India privacy update</div>
+        <h1>Review how YouTube uses your data</h1>
+        <p>We use some data to run YouTube. Other data helps personalize recommendations and ads. You can choose the optional uses now and change them any time.</p>
+        <div class="hero">
+          <div class="tag">English</div><div class="tag">Hindi available</div><div class="tag">DPDP notice</div>
+          <p style="margin-top:10px">Your choices are saved to your consent record for YouTube India.</p>
+        </div>
+      </section>
+      <section class="screen" id="s2">
+        <div class="eyebrow">Purpose choices</div>
+        <h1>Choose what feels right</h1>
+        <div class="row">
+          <div><strong>Run YouTube</strong><span>Security, playback, account access, and abuse prevention. Required to provide the service.</span></div>
+          <button class="toggle on" aria-label="Run YouTube required" disabled></button>
+        </div>
+        <div class="row">
+          <div><strong>Better recommendations</strong><span>Use watch and search history to tune Home, Shorts, and Up Next.</span></div>
+          <button class="toggle on" data-purpose="recommendations" aria-label="Recommendations consent"></button>
+        </div>
+        <div class="row">
+          <div><strong>Personalized ads</strong><span>Use activity to make ads more relevant. Turn off for contextual ads.</span></div>
+          <button class="toggle" data-purpose="ads" aria-label="Personalized ads consent"></button>
+        </div>
+        <div class="row">
+          <div><strong>Product analytics</strong><span>Use activity signals to improve YouTube features and reliability.</span></div>
+          <button class="toggle on" data-purpose="analytics" aria-label="Analytics consent"></button>
+        </div>
+      </section>
+      <section class="screen" id="s3">
+        <div class="eyebrow">Family verification</div>
+        <h1>Because you are under 18, add a parent</h1>
+        <p>DPDP requires a parent or lawful guardian for optional processing of a child's personal data. Until verified, optional ads and tracking stay off.</p>
+        <label for="email"><strong>Parent email or mobile</strong></label>
+        <input class="input" id="email" value="parent@example.com" aria-label="Parent email or mobile">
+        <div class="hero">
+          <strong>Default while waiting</strong>
+          <p style="margin-top:8px">Recommendations can use on-device session signals. Personalized ads and behavioral monitoring remain off.</p>
+        </div>
+      </section>
+      <section class="screen" id="s4">
+        <div class="eyebrow">Rights hub</div>
+        <h1>Your data controls are in one place</h1>
+        <div class="row"><div><strong>Access my YouTube data</strong><span>Download a summary of watch, search, ad, and consent records.</span></div><button class="link-button">Start</button></div>
+        <div class="row"><div><strong>Correct account details</strong><span>Update age, language, parent contact, and profile info.</span></div><button class="link-button">Edit</button></div>
+        <div class="row"><div><strong>Erase optional data</strong><span>Delete recommendation and ad personalization data not needed by law.</span></div><button class="link-button">Erase</button></div>
+        <div class="row"><div><strong>Raise a privacy grievance</strong><span>Track status and escalation path from YouTube India.</span></div><button class="link-button">Open</button></div>
+      </section>
+      <section class="screen" id="s5">
+        <div class="eyebrow">Saved</div>
+        <div class="check">✓</div>
+        <h1>Your YouTube privacy choices are active</h1>
+        <p><span id="summary-recommendations">Recommendations are on.</span> <span id="summary-analytics">Analytics are on.</span> <span id="summary-ads">Personalized ads are off.</span> Parent verification has been sent, and you can return to this privacy center from Settings.</p>
+        <div class="hero">
+          <strong>Consent record ID</strong>
+          <p style="margin-top:8px">YT-IN-2026-07-03-2048</p>
+        </div>
+      </section>
+    </main>
+    <div class="actions">
+      <button class="primary" id="next">Continue</button>
+      <button class="secondary" id="back">Back</button>
+    </div>
+  </div>
+  <script>
+    const screens = [...document.querySelectorAll(".screen")];
+    const bars = [...document.querySelectorAll(".bar")];
+    const next = document.querySelector("#next");
+    const back = document.querySelector("#back");
+    const phone = document.querySelector(".phone");
+    let index = 0;
+    function render() {
+      screens.forEach((screen, i) => screen.classList.toggle("active", i === index));
+      bars.forEach((bar, i) => bar.classList.toggle("done", i <= index));
+      back.style.visibility = index === 0 ? "hidden" : "visible";
+      next.textContent = index === screens.length - 1 ? "Back to YouTube" : index === 2 ? "Send verification" : "Continue";
+      phone.classList.toggle("hide-actions", false);
+      const state = Object.fromEntries([...document.querySelectorAll("[data-purpose]")].map((button) => [button.dataset.purpose, button.classList.contains("on")]));
+      document.querySelector("#summary-recommendations").textContent = state.recommendations ? "Recommendations are on." : "Recommendations are off.";
+      document.querySelector("#summary-analytics").textContent = state.analytics ? "Analytics are on." : "Analytics are off.";
+      document.querySelector("#summary-ads").textContent = state.ads ? "Personalized ads are on." : "Personalized ads are off.";
+    }
+    document.querySelectorAll(".toggle:not([disabled])").forEach((button) => {
+      button.addEventListener("click", () => button.classList.toggle("on"));
+    });
+    next.addEventListener("click", () => {
+      if (index === screens.length - 1) {
+        index = 0;
+      } else {
+        index += 1;
+      }
+      render();
+    });
+    back.addEventListener("click", () => {
+      index = Math.max(0, index - 1);
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>
